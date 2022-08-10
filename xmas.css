@@ -1,0 +1,12 @@
+html {
+	background-color:#070;
+	color:#f00;
+}
+
+fieldset,legend {
+	background-color:#fff;
+}
+
+* {
+	border-color:#f00;
+}

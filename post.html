@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Post</title>
+	</head>
+	<body>
+
+		<a href="stream"><button>See stream</button></a><br>
+
+		Parent Post ID (leave blank if not a reply): <input id="reply-id" value="REPLACEME"></input><br>
+		Name: <input id="name"></input> (please don't impersonate people)<br>
+		Content: <textarea id="content"></textarea><a href="/markdownInfo.htm"><button>Markdown Guide</button></a><br>
+		Image Address (leave blank for no picture): <input id="image-address" type="text"></input><br>
+
+		<button onclick="post()">Post</button>
+
+		<script>
+
+			function post() {
+
+
+				let data = {
+					name:document.getElementById('name').value.replaceAll('"','&quot;'),
+					content:document.getElementById('content').value.replaceAll('"','&quot;')
+				};
+
+				let replyId = document.getElementById('reply-id').value;
+				replyId != '' ? data.parentId = parseFloat(replyId) : '';
+
+				let image = document.getElementById('image-address').value;
+				image != '' ? data.image = image : '';
+
+				let done = 'makePost' + JSON.stringify(data);
+				console.log(done);
+
+				let xhttp = new XMLHttpRequest();
+				xhttp.open('POST',done);
+				xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+				xhttp.send('');
+
+				window.location.href = ('stream');
+
+			};
+
+		</script>
+
+	</body>
+</html>
