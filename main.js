@@ -102,7 +102,8 @@ function parsePost(post,individualPage) {
 	
 	post.image ? done += '<a href="' + post.image + '" target="_blank"><img style="max-width:500px" alt="Post image" src="' + post.image + '" /></a>' : '';
 	
-	done += '<br><br><i style="color:gray">Posted ' + (new Date(post.time)).toString() + '</i>';
+	let randDateID = Math.floor(Math.random() * 2**48);
+	done += '<br><br><i style="color:gray">Posted <span id="' + randDateID + '"></span></i><script>document.getElementById(' + randDateID + ').innerHTML = (new Date(' + post.time + ')).toString()</script>';
 	if (post.id) {
 		done += '<br><i style="color:gray;font-size:12px">ID: ' + post.id + '</i>';
 		individualPage||!post.replyIdList?'':done += '<br><a href="viewPost' + post.id + '"><button>See replies (' + post.replyIdList.length + ')</button></a>';
@@ -393,5 +394,4 @@ let server = http.createServer((request,response)=>{
 });
 
 
-// Must change this to local IP!!
-server.listen(1025,'192.168.1.134');
+server.listen(80);
