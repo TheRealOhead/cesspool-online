@@ -112,9 +112,32 @@ function parsePost(post,individualPage) {
 	return done;
 };
 
+function createPageButtons(pageNumber, postsPerPage, reachedEnd) {
+	pageNumber = Number(pageNumber);
+	let done = '';
+	if (pageNumber != 0) {
+		done += `<a href="./stream${pageNumber - 1}"><button>&lt;</button></a>`;
+	}
+	done += `Page ${pageNumber + 1}`
+	if (!reachedEnd) {
+		done += `<a href="./stream${Number(pageNumber) + 1}"><button>&gt;</button></a>`;
+	}
+	done += '<br>'
+	return done;
+}
+
 function getAllPosts(pageNumber,postsPerPage) {
+
 	let rawData = fs.readFileSync('posts.json','utf8');
 	data = JSON.parse(rawData);
+
+	let parentPosts = [];
+
+
+	data.posts.forEach((post)=>{
+		if (!post.parentId)
+			parentPosts.push(post);
+	});
 
 	let script = () => {
 		let autoReloadCheckbox = document.getElementById('autoReload');
@@ -131,19 +154,29 @@ function getAllPosts(pageNumber,postsPerPage) {
 		},10000);
 	};
 
-	let done = '<a href="/"><img width="32" style="image-rendering:pixelated" src="/logo.png" alt="Logo: A Minecraft bucket full of septic fluid" /></a><style>img {max-width:500px}</style><meta charset="utf-16" /><a href="post"><button>Make a post</button></a><a href="viewPost' + getRandomPostId() + '"><button>Random Post</button></a><input id="autoReload" type="checkbox" />Auto-reload (uses cookies)<a href="info"><button>See site statistics</button></a><script>(' + script + ')()</script><br>';
-
 	// Christmas
 	let date = new Date();
 	if (date.getMonth() == 11 && date.getDate() == 25) {
 		done += '<link href="xmas.css" rel="stylesheet">';
 	};
 
+	// Top bar
+	let done = '<a href="/"><img width="32" style="image-rendering:pixelated" src="/logo.png" alt="Logo: A Minecraft bucket full of septic fluid" /></a><style>img {max-width:500px}</style><meta charset="utf-16" /><a href="post"><button>Make a post</button></a><a href="viewPost' + getRandomPostId() + '"><button>Random Post</button></a><input id="autoReload" type="checkbox" />Auto-reload (uses cookies)<a href="info"><button>See site statistics</button></a><script>(' + script + ')()</script><br>';
+	let postsString = '';
+	let truePostCount = 0;
+	let i = 0;
+	for (i = pageNumber * postsPerPage; i < pageNumber + postsPerPage && i < parentPosts.length; i++) {
+		let post = parentPosts[i];
+		postsString += parsePost(post,false);
+	}
+	reachedEnd = !(i < parentPosts.length);
 
-	data.posts.forEach((post)=>{
-		if (!post.parentId)
-			done += parsePost(post,false);
-	});
+
+	done += createPageButtons(pageNumber, postsPerPage, reachedEnd);
+
+	done += postsString;
+
+	done += createPageButtons(pageNumber, postsPerPage, reachedEnd);
 
 	return done;
 }
@@ -284,10 +317,10 @@ let server = http.createServer((request,response)=>{
 			////////////
 
 			if (request.url.substring(0,strings.stream.length) == strings.stream) {
-				let pageNumber = (request.url.substring(strings.stream.length));
+				let pageNumber = (request.url.substring(strings.stream.length)) || 0;
 				const postsPerPage = 50;
 
-				let done = getAllPosts(0,50);
+				let done = getAllPosts(pageNumber,postsPerPage);
 
 				response.end(done);
 			};
