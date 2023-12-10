@@ -93,7 +93,7 @@ function parsePost(post,individualPage) {
 	post.name == "Owen" ? post.name = '<span style="color:#d0f;font-weight:bold" title="Owen made the site, I think he deserves a cool looking name">Owen</span>' : '';
 
 
-	done += '<fieldset';
+	done += '<head><meta name="google-adsense-account" content="ca-pub-4228926767723725"></head><fieldset';
 
 	// If post is prime, make it light blue
 	if (primePosts.includes(post.id)) {
