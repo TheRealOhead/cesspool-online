@@ -13,13 +13,21 @@ const allowedFiles = [
 	'/markdownInfo.htm'
 ];
 
+const boardNames = [
+	'test',
+	'main',
+	'suggestions',
+	'videogames',
+	'horrible-vile-things',
+]
+
 const bannedIPs = [];
 
-var primePosts = JSON.parse(fs.readFileSync('posts.json')).primePosts;
-var underlinedNames = JSON.parse(fs.readFileSync('posts.json')).underlinedNames;
+var primePosts = JSON.parse(fs.readFileSync('../cesspool-data/posts.json')).primePosts;
+var underlinedNames = JSON.parse(fs.readFileSync('../cesspool-data/posts.json')).underlinedNames;
 
 function getRandomPostId() {
-	let posts = JSON.parse(fs.readFileSync('posts.json')).posts;
+	let posts = JSON.parse(fs.readFileSync('../cesspool-data/posts.json')).posts;
 
 	let f = ()=>{
 		return posts[Math.floor(Math.random() * posts.length)];
@@ -41,7 +49,7 @@ function getRandomPostId() {
 function sanitizeString(str,doMarkdown) {
 	let done = str;
 
-	done = done.replace(/>/g,'&gt;').replace(/</g,'&lt;').replace(/\/n/g,'<br>');
+	done = done.replaceAll(/>/g,'&gt;').replaceAll(/</g,'&lt;').replaceAll(/\/n/g,'<br>');
 
 	if (doMarkdown) {
 		replaceTable = [
@@ -106,7 +114,7 @@ function parsePost(post,individualPage) {
 	done += '<br><br><i style="color:gray">Posted <span id="' + randDateID + '"></span></i><script>document.getElementById(' + randDateID + ').innerHTML = (new Date(' + post.time + ')).toString()</script>';
 	if (post.id) {
 		done += '<br><i style="color:gray;font-size:12px">ID: ' + post.id + '</i>';
-		individualPage||!post.replyIdList?'':done += '<br><a href="viewPost' + post.id + '"><button>See replies (' + post.replyIdList.length + ')</button></a>';
+		individualPage||!post.replyIdList?'':done += '<br><a href="/viewPost' + post.id + '"><button>See replies (' + post.replyIdList.length + ')</button></a>';
 	};
 	done += '</fieldset>';
 	return done;
@@ -126,17 +134,20 @@ function createPageButtons(pageNumber, postsPerPage, reachedEnd) {
 	return done;
 }
 
-function getAllPosts(pageNumber,postsPerPage) {
+function getAllPosts(pageNumber,postsPerPage,board) {
 
-	let rawData = fs.readFileSync('posts.json','utf8');
+	let rawData = fs.readFileSync('../cesspool-data/posts.json','utf8');
 	data = JSON.parse(rawData);
 
 	let parentPosts = [];
 
 
 	data.posts.forEach((post)=>{
-		if (!post.parentId)
-			parentPosts.push(post);
+		if (!post.parentId) {
+			if (post.board == board) {
+				parentPosts.push(post);
+			}
+		}
 	});
 
 	let script = () => {
@@ -154,14 +165,23 @@ function getAllPosts(pageNumber,postsPerPage) {
 		},10000);
 	};
 
+	boardSelectorHTML = '';
+	boardNames.forEach(name=>{
+		boardSelectorHTML += `<option value="${name}">${name}</option>`;
+	});
+
+	let done = '';
+
 	// Christmas
 	let date = new Date();
 	if (date.getMonth() == 11 && date.getDate() == 25) {
-		done += '<link href="xmas.css" rel="stylesheet">';
+		done += '<link href="/xmas.css" rel="stylesheet">';
 	};
 
+	done += '<div style="position:sticky;top:0px;background-color:white" width="100%" height="auto">'
+
 	// Top bar
-	let done = '<a href="/"><img width="32" style="image-rendering:pixelated" src="/logo.png" alt="Logo: A Minecraft bucket full of septic fluid" /></a><style>img {max-width:500px}</style><meta charset="utf-16" /><a href="post"><button>Make a post</button></a><a href="viewPost' + getRandomPostId() + '"><button>Random Post</button></a><input id="autoReload" type="checkbox" />Auto-reload (uses cookies)<a href="info"><button>See site statistics</button></a><script>(' + script + ')()</script><br>';
+	done += '<a href="/"><img width="32" style="image-rendering:pixelated" src="/logo.png" alt="Logo: A Minecraft bucket full of septic fluid" /></a><style>img {max-width:500px}</style><meta charset="utf-16" /><a href="' + (requestArguments[0] == strings.board ? ('/post/board/' + requestArguments[1]) : '/post') + '"><button>Make a post</button></a><a href="viewPost' + getRandomPostId() + '"><button>Random Post</button></a><input id="autoReload" type="checkbox" />Auto-reload (uses cookies)<a href="info"><button>See site statistics</button></a><script>(' + script + ')()</script><br>';
 	let postsString = '';
 	let truePostCount = 0;
 	let i = 0;
@@ -171,10 +191,21 @@ function getAllPosts(pageNumber,postsPerPage) {
 	}
 	reachedEnd = !(i < parentPosts.length);
 
+	done += '<br>'
+	
+	done += 'You are viewing the <select id="board-name" onchange="document.location.href = document.getElementById(\'board-name\').value == \'main\' ? \'/stream\' : \'/board/\' + document.getElementById(\'board-name\').value">' + boardSelectorHTML + '</select> board<script>document.getElementById(\'board-name\').value = "' + (requestArguments[0] == 'board' ? requestArguments[1] : 'main') + '"</script>'
+
+	done += '<hr>';
+
+	done += '</div>'
 
 	done += createPageButtons(pageNumber, postsPerPage, reachedEnd);
 
+	done += '<hr>';
+
 	done += postsString;
+
+	done += '<hr>';
 
 	done += createPageButtons(pageNumber, postsPerPage, reachedEnd);
 
@@ -182,7 +213,16 @@ function getAllPosts(pageNumber,postsPerPage) {
 }
 
 
+var requestArguments; // This is retarded but I'll be damned if I'm adding another argument to getAllPosts()
 
+const strings = { // This is anti-retarded
+	makePost:'/makePost',
+	viewPost:'/viewPost',
+	post:'/post',
+	info:'/info',
+	stream:'stream',
+	board:'board',
+};
 
 let server = http.createServer((request,response)=>{
 	response.statusCode = 200;
@@ -190,26 +230,21 @@ let server = http.createServer((request,response)=>{
 
 	console.log('REQUEST  | ' + request.url);
 
-	fs.appendFileSync('log.txt','IP=' + request.connection.remoteAddress + ';TIME=' + (new Date().toString()) + ';URL=' + request.url + '\n')
+	fs.appendFileSync('../cesspool-data/log.txt','IP=' + request.connection.remoteAddress + ';TIME=' + (new Date().toString()) + ';URL=' + request.url + '\n')
 
 	if (bannedIPs.includes(request.connection.remoteAddress)) {
 		response.end('ur ip is banned lmao','plain/text');
 		return;
 	};
 
+	requestArguments = request.url.split('/')
+	requestArguments.shift(); // Should get rid of empty thing at beginning
+
 	switch (request.url) {
 		case '/':
 			response.end(fs.readFileSync('main.html','utf8'));
 			break;
 		default:
-			let strings = {
-				makePost:'/makePost',
-				viewPost:'/viewPost',
-				post:'/post',
-				info:'/info',
-				stream:'/stream'
-			};
-
 
 			  ///////////////
 			 // MAKE POST //
@@ -219,7 +254,7 @@ let server = http.createServer((request,response)=>{
 				
 				// Get datas
 			 	let post = JSON.parse(decodeURI(request.url.substring(strings.makePost.length)));
-				let data = JSON.parse(fs.readFileSync('posts.json'));
+				let data = JSON.parse(fs.readFileSync('../cesspool-data/posts.json'));
 				
 
 				// Apply some stuff to the post beforehand
@@ -243,7 +278,7 @@ let server = http.createServer((request,response)=>{
 				console.log('POSTDATA |' + post);
 				data.posts.unshift(post);
 
-				fs.writeFileSync('posts.json',JSON.stringify(data));
+				fs.writeFileSync('../cesspool-data/posts.json',JSON.stringify(data));
 			};
 
 
@@ -255,7 +290,7 @@ let server = http.createServer((request,response)=>{
 				
 				// Gettey datas
 				let id = (request.url.substring(strings.viewPost.length));
-				let data = JSON.parse(fs.readFileSync('posts.json'));
+				let data = JSON.parse(fs.readFileSync('../cesspool-data/posts.json'));
 
 				let done = '<meta charset="utf-16">';
 
@@ -280,7 +315,7 @@ let server = http.createServer((request,response)=>{
 
 
 				// Do reply button
-				done += '<a href="/post' + me.id + '"><button>Write reply</button></a>'
+				done += '<a href="/post/replyTo/' + me.id + '"><button>Write reply</button></a>'
 
 
 				// Find its replies
@@ -304,7 +339,8 @@ let server = http.createServer((request,response)=>{
 			
 			if (request.url.substring(0,strings.post.length) == strings.post) {
 				let html = fs.readFileSync('post.html','utf8');
-				html = html.replace('REPLACEME',request.url.substring(strings.post.length));
+				html = html.replace('REPLACEME' ,requestArguments[1] == 'replyTo' ? requestArguments[2] : '');
+				html = html.replace('REPLACEME2',requestArguments[1] == 'board' ? requestArguments[2] : '');
 				response.end(html);
 			};
 
@@ -312,15 +348,15 @@ let server = http.createServer((request,response)=>{
 
 
 
-			  ////////////
-			 // STREAM //
-			////////////
+			  ///////////////////////////
+			 // STREAM / BOARD STREAM //
+			///////////////////////////
 
-			if (request.url.substring(0,strings.stream.length) == strings.stream) {
-				let pageNumber = (request.url.substring(strings.stream.length)) || 0;
+			if (requestArguments[0] == strings.stream || requestArguments[0] == strings.board) {
+				let pageNumber = requestArguments[0] == strings.stream ? requestArguments[1] || 0 : requestArguments[2] || 0;
 				const postsPerPage = 50;
 
-				let done = getAllPosts(pageNumber,postsPerPage);
+				let done = requestArguments[0] == strings.stream ? getAllPosts(pageNumber,postsPerPage) : getAllPosts(pageNumber,postsPerPage,requestArguments[1]);
 
 				response.end(done);
 			};
@@ -335,7 +371,7 @@ let server = http.createServer((request,response)=>{
 
 			if (request.url.substring(0,strings.info.length) == strings.info) {
 
-				let data = JSON.parse(fs.readFileSync('posts.json'));
+				let data = JSON.parse(fs.readFileSync('../cesspool-data/posts.json'));
 
 				let profanity = [
 					'shit',

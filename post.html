@@ -6,14 +6,15 @@
 	</head>
 	<body>
 
-		<a href="stream"><button>See stream</button></a><br>
+		<button onclick="history.back()">Go back</button><br>
 
-		Parent Post ID (leave blank if not a reply): <input id="reply-id" value="REPLACEME"></input><br>
+		<input style="display:none" id="reply-id" value="REPLACEME"></input><br>
+		<input style="display:none" id="board-name" value="REPLACEME2"></input><br>
 		Name: <input id="name"></input> (please don't impersonate people)<br>
 		Content: <textarea id="content"></textarea><a href="/markdownInfo.htm"><button>Markdown Guide</button></a><br>
 		Image Address (leave blank for no picture): <input id="image-address" type="text"></input><br>
 
-		<button onclick="post()">Post</button>
+		<button onclick="post()">Post</button> (You may need to reload the page to see your post)
 
 		<script>
 
@@ -28,10 +29,13 @@
 				let replyId = document.getElementById('reply-id').value;
 				replyId != '' ? data.parentId = parseFloat(replyId) : '';
 
+				let boardName = document.getElementById('board-name').value;
+				boardName != '' ? data.board = boardName : '';
+
 				let image = document.getElementById('image-address').value;
 				image != '' ? data.image = image : '';
 
-				let done = 'makePost' + JSON.stringify(data);
+				let done = '/makePost' + JSON.stringify(data);
 				console.log(done);
 
 				let xhttp = new XMLHttpRequest();
@@ -39,8 +43,7 @@
 				xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 				xhttp.send('');
 
-				window.location.href = ('stream');
-
+				history.back();
 			};
 
 		</script>
