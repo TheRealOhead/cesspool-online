@@ -182,7 +182,7 @@ function getAllPosts(pageNumber,postsPerPage,board) {
 	done += '<div style="position:sticky;top:0px;background-color:white" width="100%" height="auto">'
 
 	// Top bar
-	done += '<a href="/"><img width="32" style="image-rendering:pixelated" src="/logo.png" alt="Logo: A Minecraft bucket full of septic fluid" /></a><style>img {max-width:500px}</style><meta charset="utf-16" /><a href="' + (requestArguments[0] == strings.board ? ('/post/board/' + requestArguments[1]) : '/post') + '"><button>Make a post</button></a><a href="viewPost' + getRandomPostId() + '"><button>Random Post</button></a><input id="autoReload" type="checkbox" />Auto-reload (uses cookies)<a href="info"><button>See site statistics</button></a><script>(' + script + ')()</script><br>';
+	done += '<a href="/"><img width="32" style="image-rendering:pixelated" src="/logo.png" alt="Logo: A Minecraft bucket full of septic fluid" /></a><style>img {max-width:500px}</style><meta charset="utf-16" /><a href="' + (requestArguments[0] == strings.board ? ('/post/board/' + requestArguments[1]) : '/post') + '"><button>Make a post</button></a><a href="viewPost' + getRandomPostId() + '"><button>Random Post</button></a><input id="autoReload" type="checkbox" />Auto-reload (uses cookies)<a href="/info"><button>See site statistics</button></a><script>(' + script + ')()</script><br>';
 	let postsString = '';
 	let truePostCount = 0;
 	let i = 0;
