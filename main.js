@@ -47,7 +47,7 @@ function getRandomPostId() {
 };
 
 function sanitizeString(str,doMarkdown) {
-	let done = str;
+	let done = str.toString();
 
 	done = done.replaceAll(/>/g,'&gt;').replaceAll(/</g,'&lt;').replaceAll(/\/n/g,'<br>');
 
