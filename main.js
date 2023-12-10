@@ -49,7 +49,7 @@ function getRandomPostId() {
 function sanitizeString(str,doMarkdown) {
 	let done = str.toString();
 
-	done = done.replaceAll(/>/g,'&gt;').replaceAll(/</g,'&lt;').replaceAll(/\/n/g,'<br>');
+	done = done.replace(/>/g,'&gt;').replace(/</g,'&lt;').replace(/\/n/g,'<br>');
 
 	if (doMarkdown) {
 		replaceTable = [
