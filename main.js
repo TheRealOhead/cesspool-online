@@ -125,11 +125,11 @@ function createPageButtons(pageNumber, postsPerPage, reachedEnd) {
 	pageNumber = Number(pageNumber);
 	let done = '';
 	if (pageNumber != 0) {
-		done += `<a href="./stream${pageNumber - 1}"><button>&lt;</button></a>`;
+		done += `<a href="/stream/${pageNumber - 1}"><button>&lt;</button></a>`;
 	}
 	done += `Page ${pageNumber + 1}`
 	if (!reachedEnd) {
-		done += `<a href="./stream${Number(pageNumber) + 1}"><button>&gt;</button></a>`;
+		done += `<a href="/stream/${Number(pageNumber) + 1}"><button>&gt;</button></a>`;
 	}
 	done += '<br>'
 	return done;
