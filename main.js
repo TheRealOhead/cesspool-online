@@ -200,6 +200,21 @@ function getAllPosts(pageNumber,postsPerPage,board) {
 
 	done += '</div>'
 
+	done += `<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4228926767723725"
+     crossorigin="anonymous"></script>
+<!-- Top of Stream -->
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-4228926767723725"
+     data-ad-slot="2523640841"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>
+     (adsbygoogle = window.adsbygoogle || []).push({});
+</script>`;
+
+	done += '<hr>'
+
 	done += createPageButtons(pageNumber, postsPerPage, reachedEnd);
 
 	done += '<hr>';
