@@ -94,7 +94,7 @@ function parsePost(post,individualPage) {
 	post.name == "Owen" ? post.name = '<span style="color:#d0f;font-weight:bold" title="Owen made the site, I think he deserves a cool looking name">Owen</span>' : '';
 
 
-	done += '<head><meta name="google-adsense-account" content="ca-pub-4228926767723725"></head><fieldset';
+	done += '<fieldset';
 
 	// If post is prime, make it light blue
 	if (primePosts.includes(post.id)) {
@@ -206,19 +206,6 @@ function getAllPosts(pageNumber,postsPerPage,board) {
 	done += '<hr>';
 
 	done += '</div>'
-
-	done += `<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4228926767723725"
-     crossorigin="anonymous"></script>
-<!-- Top of Stream -->
-<ins class="adsbygoogle"
-     style="display:inline-block;width:728px;height:90px"
-     data-ad-client="ca-pub-4228926767723725"
-     data-ad-slot="2523640841"></ins>
-<script>
-     (adsbygoogle = window.adsbygoogle || []).push({});
-</script>`;
-
-	done += '<hr>'
 
 	done += createPageButtons(pageNumber, postsPerPage, reachedEnd);
 
