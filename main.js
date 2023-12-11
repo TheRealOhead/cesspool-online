@@ -17,8 +17,8 @@ const boardNames = [
 	'main',
 	'suggestions',
 	'videogames',
-	'horrible-vile-things',
 	'neptunes-pride',
+	'horrible-vile-things',
 ]
 
 const bannedIPs = [];
@@ -172,11 +172,17 @@ function getAllPosts(pageNumber,postsPerPage,board) {
 
 	let done = '';
 
-	// Christmas
 	let date = new Date();
+
+	// Christmas
 	if (date.getMonth() == 11 && date.getDate() == 25) {
 		done += '<link href="/xmas.css" rel="stylesheet">';
 	};
+	// April Fools
+	if (date.getMonth() == 3 && date.getDate() == 1) {
+		done += '<link href="/xmas.css" rel="stylesheet">';
+	}
+
 
 	done += '<div style="position:sticky;top:0px;background-color:white" width="100%" height="auto">'
 
