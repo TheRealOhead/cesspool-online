@@ -14,7 +14,6 @@ const allowedFiles = [
 ];
 
 const boardNames = [
-	'test',
 	'main',
 	'suggestions',
 	'videogames',
