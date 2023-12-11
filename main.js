@@ -203,11 +203,9 @@ function getAllPosts(pageNumber,postsPerPage,board) {
      crossorigin="anonymous"></script>
 <!-- Top of Stream -->
 <ins class="adsbygoogle"
-     style="display:block"
+     style="display:inline-block;width:728px;height:90px"
      data-ad-client="ca-pub-4228926767723725"
-     data-ad-slot="2523640841"
-     data-ad-format="auto"
-     data-full-width-responsive="true"></ins>
+     data-ad-slot="2523640841"></ins>
 <script>
      (adsbygoogle = window.adsbygoogle || []).push({});
 </script>`;
