@@ -20,6 +20,7 @@ const boardNames = [
 	'videogames',
 	'neptunes-pride',
 	'horrible-vile-things',
+	'lethal-company',
 ]
 
 const bannedIPs = [];
