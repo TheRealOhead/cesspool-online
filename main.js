@@ -10,7 +10,8 @@ const allowedFiles = [
 	'/favicon.ico',
 	'/test.txt',
 	'/xmas.css',
-	'/markdownInfo.htm'
+	'/april-fools.css',
+	'/markdownInfo.htm',
 ];
 
 const boardNames = [
@@ -180,7 +181,7 @@ function getAllPosts(pageNumber,postsPerPage,board) {
 	};
 	// April Fools
 	if (date.getMonth() == 3 && date.getDate() == 1) {
-		done += '<link href="/xmas.css" rel="stylesheet">';
+		done += '<link href="/april-fools.css" rel="stylesheet">';
 	}
 
 
