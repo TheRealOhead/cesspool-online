@@ -2,8 +2,10 @@ console.log('HELLO FUCKERS');
 
 
 
-const fs   = require('fs');
-const http = require('http');
+const fs         = require('fs');
+const http       = require('http');
+const SortedList = require('./sortedList.js')
+
 
 const allowedFiles = [
 	'/logo.png',
@@ -21,15 +23,20 @@ const boardNames = [
 	'neptunes-pride',
 	'horrible-vile-things',
 	'lethal-company',
+	'cats',
 ]
+
+
+
+
 
 const bannedIPs = [];
 
-var primePosts = JSON.parse(fs.readFileSync('../cesspool-data/posts.json')).primePosts;
-var underlinedNames = JSON.parse(fs.readFileSync('../cesspool-data/posts.json')).underlinedNames;
+const primePosts = JSON.parse(fs.readFileSync('../cesspool-data/posts.json')).primePosts;
+const underlinedNames = JSON.parse(fs.readFileSync('../cesspool-data/posts.json')).underlinedNames;
 
 function getRandomPostId() {
-	let posts = JSON.parse(fs.readFileSync('../cesspool-data/posts.json')).posts;
+	let posts = JSON.parse(fs.readFileSync('../cesspool-data/posts.json','utf8')).posts;
 
 	let f = ()=>{
 		return posts[Math.floor(Math.random() * posts.length)];
@@ -206,6 +213,12 @@ function getAllPosts(pageNumber,postsPerPage,board) {
 	done += '<hr>';
 
 	done += '</div>'
+
+	// Bail if the board is fake
+	if (board && !boardNames.includes(board)) {
+		done += `There's no board called ${board}, idiot`;
+		return done;
+	}
 
 	done += createPageButtons(pageNumber, postsPerPage, reachedEnd);
 
@@ -421,7 +434,8 @@ let server = http.createServer((request,response)=>{
 
 					let profane = false;
 					profanity.forEach((word)=>{
-						if (post.content.toLowerCase().includes(word + ' ') || post.content.toLowerCase().includes(word + '.') || post.content.toLowerCase().includes(word + '!') || post.content.toLowerCase().includes(word + '?') || post.content.toLowerCase().includes(' ' + word)) {
+						let contentOfPost = post.content.toLowerCase();
+						if (contentOfPost.includes(word + ' ') || contentOfPost.includes(word + '.') || contentOfPost.includes(word + '!') || contentOfPost.includes(word + '?') || post.content.toLowerCase().includes(' ' + word)) {
 							profane = true;
 						};
 					});
